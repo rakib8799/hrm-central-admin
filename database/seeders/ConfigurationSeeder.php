@@ -89,15 +89,15 @@ class ConfigurationSeeder extends Seeder
             ],
             [
                 'option_name' => 'domain_admin_portal',
-                'option_value' => 'dev.hrbee.app'
+                'option_value' => Constants::SUB_DOMAIN . '.' . Constants::DOMAIN
             ],
             [
                 'option_name' => 'company_http_protocol',
-                'option_value' => 'http'
+                'option_value' => 'https'
             ],
             [
                 'option_name' => 'support_email',
-                'option_value' => 'support@hrbee.app'
+                'option_value' => 'support@' . Constants::USER_PANEL . '.' . Constants::DOMAIN
             ],
             [
                 'option_name' => 'support_telephone',
