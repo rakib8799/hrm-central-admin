@@ -5,14 +5,14 @@
     id="kt_app_sidebar_footer"
   >
     <a
-      href="https://rosterbee.com"
+      href="https://hrbee.mkrdev.xyz"
       class="btn btn-flex flex-center btn-custom btn-primary overflow-hidden text-nowrap px-0 h-40px w-100"
       data-bs-toggle="tooltip"
       data-bs-trigger="hover"
       data-bs-dismiss-="click"
       title="Rostering made easy"
     >
-      <span class="btn-label">RosterBee</span>
+      <span class="btn-label">HrBee</span>
       <KTIcon icon-name="document" icon-class="btn-icon fs-2 m-0" />
     </a>
   </div>

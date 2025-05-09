@@ -7,7 +7,7 @@
         <div class="d-flex flex-column flex-center py-7 py-lg-15 px-5 px-md-15 w-100">
             <!--begin::Logo-->
             <Link :href="''" class="mb-0 mb-lg-12">
-                <img alt="Logo" :src="getAssetPath('/media/logos/nonditosoft-logo.png')" class="h-60px h-lg-75px"/>
+                <img alt="Logo" :src="getAssetPath('/media/logos/mkr-logo.png')" class="h-60px h-lg-75px"/>
             </Link>
             <!--end::Logo-->
 

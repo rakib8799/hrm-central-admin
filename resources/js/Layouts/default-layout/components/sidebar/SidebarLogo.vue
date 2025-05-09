@@ -9,19 +9,19 @@
           (themeMode === 'dark' && layout === 'light-sidebar')
         "
         alt="Logo"
-        src="/media/logos/nonditosoft-logo.png"
-        class="h-40px app-sidebar-logo-default"
+        src="/media/logos/mkr-logo.png"
+        class="app-sidebar-logo-default" style="height: 15vh;"
       />
       <img
         v-if="themeMode === 'light' && layout === 'light-sidebar'"
         alt="Logo"
-        src="/media/logos/nonditosoft-logo.png"
-        class="h-40px app-sidebar-logo-default"
+        src="/media/logos/mkr-logo.png"
+        class="app-sidebar-logo-default" style="height: 15vh;"
       />
       <img
         alt="Logo"
-        src="/media/logos/nonditosoft-icon.png"
-        class="h-40px app-sidebar-logo-minimize"
+        src="/media/logos/mkr-icon.png"
+        class="app-sidebar-logo-minimize" style="height: 5vh;"
       />
     </a>
     <!--end::Logo image-->
