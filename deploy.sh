@@ -3,8 +3,8 @@
 echo "🚀 Starting Laravel, Inertia & Vue.js deployment..."
 
 # Configurations
-USER="admin"
-SUB_DOMAIN="basic-project"
+USER="hrm"
+SUB_DOMAIN="hrm-central-admin"
 DOMAIN="mkrdev.xyz"
 
 APP_DIR="/home/$USER/web/$SUB_DOMAIN.$DOMAIN/public_html"
