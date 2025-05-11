@@ -1,0 +1,43 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches: [main]  # or 'development'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, pdo, pdo_mysql, gd, zip
+        tools: composer
+
+    - name: Install Composer dependencies
+      run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
+
+    - name: Set up Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Node dependencies and build assets
+      run: |
+        npm ci
+        npm run build
+
+    - name: Add SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan -H 155.133.23.233 >> ~/.ssh/known_hosts
+
+    - name: Deploy via SSH
+      run: ssh -o StrictHostKeyChecking=no root@155.133.23.233 'bash -s' < ./deploy.sh
