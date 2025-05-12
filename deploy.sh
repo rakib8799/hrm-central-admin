@@ -46,7 +46,7 @@ sudo -u "$USER" composer clear-cache || {
 
 # Run Composer install with the --no-dev flag to avoid installing unnecessary dev dependencies
 echo "📦 Installing Composer dependencies..."
-sudo -u "$USER" composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-scripts || {
+sudo -u "$USER" composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev || {
     echo "❌ Composer install failed"
     exit 1
 }
