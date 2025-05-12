@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -o pipefail
+
 echo "🚀 Starting Laravel, Inertia & Vue.js deployment..."
 
 # === CONFIGURATION ===
@@ -10,67 +13,89 @@ APP_DIR="/home/$USER/web/$SUB_DOMAIN.$DOMAIN/public_html"
 PHP="php8.3"
 
 # === STEP 1: Navigate to App Directory ===
+echo "📂 Navigating to app directory..."
 cd "$APP_DIR" || {
     echo "❌ Failed to access $APP_DIR"
     exit 1
 }
 
-# === STEP 2: Check for Git Repository ===
+# === STEP 2: Git Pull ===
 if [ ! -d ".git" ]; then
-    echo "❌ No Git repository found in $APP_DIR"
+    echo "❌ No Git repository found."
     exit 1
 fi
 
-# === STEP 3: Pull Latest Code ===
-echo "📥 Pulling latest changes from Git..."
-
-git config --global --add safe.directory $APP_DIR
-
+echo "📥 Pulling latest code..."
+git config --global --add safe.directory "$APP_DIR"
 git reset --hard
-git pull origin main --ff
+git pull origin main --ff-only
 
-# === STEP 4: PHP Dependencies ===
-echo "📦 Installing PHP dependencies..."
-if [ -d "vendor" ]; then
-    echo "🧹 Removing old vendor directory..."
-    rm -rf vendor/
-fi
+# === STEP 3: Clear Vendor Directory ===
+echo "🧹 Deleting vendor directory..."
+rm -rf vendor/
 
-composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction || { echo "❌ Composer install failed"; exit 1; }
+# === STEP 4: Composer Install ===
+echo "📦 Installing Composer dependencies..."
+
+# Clear Composer cache to avoid old dependencies or corrupt cache
+echo "🧹 Clearing Composer cache..."
+sudo -u "$USER" composer clear-cache || {
+    echo "❌ Composer cache clear failed"
+    exit 1
+}
+
+# Run Composer install with the --no-dev flag to avoid installing unnecessary dev dependencies
+echo "📦 Installing Composer dependencies..."
+sudo -u "$USER" composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-scripts || {
+    echo "❌ Composer install failed"
+    exit 1
+}
+
+# Fix permissions for vendor directory after Composer install
+echo "🔧 Fixing permissions for vendor directory..."
+chown -R "$USER":"$USER" vendor/
+chmod -R 755 vendor/
 
 # === STEP 5: Laravel Environment Setup ===
-echo "🔐 Setting up Laravel application..."
+echo "🔐 Setting up Laravel environment..."
+
 if [ ! -f ".env" ]; then
-    echo "📄 .env not found. Copying from example..."
+    echo "📄 .env not found, copying from .env.example"
     cp .env.example .env
 fi
 
-echo "📂 Fixing permissions..."
-chmod -R ug+rwx storage bootstrap/cache
-chown -R www-data:www-data storage bootstrap/cache
+# Fix file permissions for .env and directories
+echo "🔧 Fixing permissions for .env and directories..."
+chown "$USER":"www-data" .env
+chmod 664 .env
+chown -R "$USER":"www-data" storage/ bootstrap/cache/
+chmod -R 775 storage/ bootstrap/cache/
 
-touch storage/logs/laravel.log
-chmod 666 storage/logs/laravel.log
-chown www-data:www-data storage/logs/laravel.log
-
-# === STEP 6: Laravel Artisan Commands ===
-echo "🔑 Generating application key..."
-$PHP artisan key:generate --force || { echo "❌ Artisan key generation failed"; exit 1; }
-
-echo "🧪 Running migrations & caching configs..."
-$PHP artisan migrate --force
-$PHP artisan config:cache
-$PHP artisan route:cache
-$PHP artisan view:cache
-
-# === STEP 7: Node/Vue Build ===
-echo "🧱 Installing Node dependencies & building frontend..."
-if [ -d "node_modules" ]; then
-    echo "🧹 Cleaning old node_modules..."
-    rm -rf node_modules/
+# Generate app key only if not set
+if ! grep -q '^APP_KEY=' .env; then
+    echo "🔑 Generating app key..."
+    sudo -u "$USER" $PHP artisan key:generate
+else
+    echo "🔑 APP_KEY already exists, skipping key generation."
 fi
 
-npm ci || npm install || { echo "❌ NPM install failed"; exit 1; }
-npm run build || { echo "❌ NPM build failed"; exit 1; }
+# === STEP 6: Node Frontend Setup ===
+echo "🧹 Cleaning old node_modules..."
+rm -rf node_modules package-lock.json
 
-echo "✅ Deployment finished successfully!"
+echo "📦 Installing Node dependencies..."
+sudo -u "$USER" npm install
+
+# Clear Vite build dir to prevent EACCES errors
+echo "🧹 Cleaning Vite build cache..."
+rm -rf public/build/assets || true
+mkdir -p public/build/assets
+chown -R "$USER":"$USER" public/build
+
+echo "⚙️ Building frontend with Vite..."
+sudo -u "$USER" npm run build || {
+    echo "❌ Vite build failed"
+    exit 1
+}
+
+echo "✅ Deployment completed successfully!"

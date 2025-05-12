@@ -19,18 +19,10 @@ jobs:
         extensions: mbstring, pdo, pdo_mysql, gd, zip
         tools: composer
 
-    - name: Install Composer dependencies
-      run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader
-
     - name: Set up Node
       uses: actions/setup-node@v3
       with:
         node-version: '22'
-
-    - name: Install Node dependencies and build assets
-      run: |
-        npm ci
-        npm run build
 
     - name: Add SSH key
       run: |
