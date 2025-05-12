@@ -25,7 +25,7 @@ jobs:
     - name: Set up Node
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
+        node-version: '22'
 
     - name: Install Node dependencies and build assets
       run: |
@@ -40,4 +40,5 @@ jobs:
         ssh-keyscan -H 155.133.23.233 >> ~/.ssh/known_hosts
 
     - name: Deploy via SSH
-      run: ssh -o StrictHostKeyChecking=no root@155.133.23.233 'bash -s' < ./deploy.sh
+      run: |
+        ssh -o StrictHostKeyChecking=no root@155.133.23.233 'bash -s' < ./deploy.sh
