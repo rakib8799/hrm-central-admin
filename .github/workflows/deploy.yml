@@ -2,7 +2,7 @@ name: Laravel CI/CD
 
 on:
   push:
-    branches: [main]  # or 'development'
+    branches: [main]
 
 jobs:
   build:
@@ -24,13 +24,22 @@ jobs:
       with:
         node-version: '22'
 
-    - name: Add SSH key
+    - name: Add SSH key (if exists)
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan -H 155.133.23.233 >> ~/.ssh/known_hosts
+        if [ -n "${{ secrets.DEPLOY_SSH_KEY }}" ]; then
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+        fi
 
     - name: Deploy via SSH
       run: |
-        ssh -o StrictHostKeyChecking=no root@155.133.23.233 'bash -s' < ./deploy.sh
+        # Get SSH key path
+        SSH_KEY="~/.ssh/id_ed25519"
+
+        # Check if repo is private (returns true/false)
+        IS_PRIVATE_REPO="${{ github.event.repository.private }}"
+
+        ssh -o StrictHostKeyChecking=no root@155.133.23.233 \
+          "export IS_PRIVATE_REPO='$IS_PRIVATE_REPO'; export SSH_KEY='$SSH_KEY'; bash -s" < ./deploy.sh
