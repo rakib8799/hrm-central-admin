@@ -39,7 +39,7 @@ class CompanyService extends BaseModelService
     public function createCompany($validatedData)
     {
         $domainAdminPortal = $this->configurationService->getConfiguration('domain_admin_portal');
-        $companyAdminDomain = $validatedData['workspace']. '.' . $domainAdminPortal->option_value;
+        $companyAdminDomain = $validatedData['workspace']. '-' . $domainAdminPortal->option_value;
         $companyDomainsArray = [
             $companyAdminDomain => $companyAdminDomain
         ];
