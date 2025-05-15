@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Constants\Constants;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,8 +42,8 @@ class DatabaseManagementService
 
     public function createTenantDatabase($workSpaceName): array
     {
-        $dbName = $workSpaceName;
-        $username = $workSpaceName;
+        $dbName = Constants::ROOT_USER . '_' . Constants::SUB_PART . '_' . $workSpaceName;
+        $username = Constants::ROOT_USER . '_' . Constants::SUB_PART . '_' . $workSpaceName . '_' . Constants::USER;
         $password = $this->generatePassword();
         $host = $this->createNewDatabase($dbName, $username, $password);
         return [
