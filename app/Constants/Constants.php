@@ -30,6 +30,6 @@ class Constants
     public const STAGING_SERVER = 'staging';
     public const USER_PANEL = 'hrbee';
     public const ROOT_USER = 'admin';
-    public const SUB_PART = 'muhuri_web';
+    public const SUB_PART = 'hrm';
     public const USER = 'user';
 }
